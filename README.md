@@ -1,4 +1,4 @@
-# rip off from [others' work](https://github.com/lengstrom/fast-style-transfer)
+# a rip-off from [others' work](https://github.com/lengstrom/fast-style-transfer)
 
 <h2>related subject:</h2>
 <h3>batch normalization:</h3>
