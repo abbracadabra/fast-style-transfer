@@ -15,13 +15,14 @@ def traingen(dirpath):
     while cursor<len(flist):
         batchfn = flist[cursor:cursor+batchsize]
         cursor+=batchsize
-    ims = []
-    for fn in batchfn:
-        im = Image.open(os.path.join(dirpath,fn))
-        im = im.resize((224, 224),Image.ANTIALIAS)
-        im = np.array(im) / 255.
-        ims.append(im)
-    yield np.array(ims)
+        ims = []
+        for fn in batchfn:
+            im = Image.open(os.path.join(dirpath, fn))
+            im = im.resize((224, 224), Image.ANTIALIAS)
+            im = np.array(im) / 255.
+            ims.append(im)
+        yield np.array(ims)
+
 
 sess = tf.Session()
 # model1
@@ -54,14 +55,7 @@ for predstyletensor,truthgram in zip(predstyletensors,grams):
 loss/=batchsize
 saver = tf.train.Saver()
 trainop = tf.train.AdamOptimizer(learning_rate=0.001).minimize(loss)
-
-# tf.summary.scalar(loss)
-# merged = tf.summary.merge_all()
-# train_writer = tf.summary.FileWriter(r"D:\Users\yl_gong\Desktop\log",
-#                                       sess.graph)
-# sess.run(tf.global_variables_initializer())
-# summary = sess.run([merged])
-# train_writer.add_summary(summary, 0)
+sess.run(tf.global_variables_initializer())
 
 def train():
     for ep in range(epoch):
@@ -71,7 +65,7 @@ def train():
         errorrec = []
         for i, batchims in enumerate(traingen(trainpath)):
             _, losstrain = sess.run([trainop, loss], feed_dict={input: batchims})
-            print(loss)
+            print(losstrain)
             if i % 5 == 0:
                 synthesizeimgs, lossval = sess.run([synthesizetensor, loss], feed_dict={input: testims})
                 errorrec.append(lossval)
@@ -80,11 +74,26 @@ def train():
                 list(map(os.unlink, (os.path.join(savepath, f) for f in os.listdir(savepath))))
                 for im in synthesizeimgs:
                     im = np.uint8(im*255)
-                    Image.fromarray(im).save(os.path.join(savepath, uuid.uuid4() + ".jpg"))
+                    Image.fromarray(im).save(os.path.join(savepath, str(uuid.uuid4()) + ".jpg"))
                 if lossval < minerr:
                     minerr = lossval
                     argminerr = len(errorrec) - 1
-                    shutil.rmtree(modelpath)
+                    shutil.rmtree(modelpath,True)
                     saver.save(sess,modelpath)
 
 train()
+
+
+
+
+
+
+# tf.summary.scalar('cc',loss)
+# merged = tf.summary.merge_all()
+# train_writer = tf.summary.FileWriter(r"D:\Users\yl_gong\Desktop\log",
+#                                       sess.graph)
+# sess.run(tf.global_variables_initializer())
+# im = Image.open(testimg)
+# im = np.expand_dims(np.array(im)/255.,axis=0)
+# summary = sess.run(merged,feed_dict={input:im})
+# train_writer.add_summary(summary, 0)
