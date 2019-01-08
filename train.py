@@ -30,7 +30,7 @@ synthesizetensor = transformnet.transform(input)
 predcontenttensor, predstyletensors = extractnet.extract(synthesizetensor,prefix="A")
 # model2
 contenttensor, styletensors = extractnet.extract(input,prefix="B")
-sess.run(tf.global_variables_initializer())
+
 styleim = Image.open(styleimg)
 styleim = styleim.resize((224, 224), Image.ANTIALIAS)
 styleim = np.expand_dims(np.array(styleim) / 255., axis=0)
@@ -55,6 +55,14 @@ loss/=batchsize
 saver = tf.train.Saver()
 trainop = tf.train.AdamOptimizer(learning_rate=0.001).minimize(loss)
 
+# tf.summary.scalar(loss)
+# merged = tf.summary.merge_all()
+# train_writer = tf.summary.FileWriter(r"D:\Users\yl_gong\Desktop\log",
+#                                       sess.graph)
+# sess.run(tf.global_variables_initializer())
+# summary = sess.run([merged])
+# train_writer.add_summary(summary, 0)
+
 def train():
     for ep in range(epoch):
         testims = next(traingen(testpath))
@@ -69,8 +77,9 @@ def train():
                 errorrec.append(lossval)
                 if len(errorrec) - argminerr > 30:
                     return
+                list(map(os.unlink, (os.path.join(savepath, f) for f in os.listdir(savepath))))
                 for im in synthesizeimgs:
-                    list(map(os.unlink,(os.path.join(savepath,f) for f in os.listdir(savepath))))
+                    im = np.uint8(im*255)
                     Image.fromarray(im).save(os.path.join(savepath, uuid.uuid4() + ".jpg"))
                 if lossval < minerr:
                     minerr = lossval

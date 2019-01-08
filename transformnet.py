@@ -14,7 +14,7 @@ def transform(input):
     tmp = convtranspose(tmp,filters=64,kernel_size=3,strides=2)
     tmp = convtranspose(tmp, filters=32, kernel_size=3, strides=2)
     tmp = conv(tmp, filternum=3, kernelsize=9, strides=1,relu=False)
-    tmp = tf.math.round(tf.nn.sigmoid(tmp)*255)
+    tmp = tf.nn.sigmoid(tmp)
     output = tf.identity(tmp,name="output")
     return output
 
