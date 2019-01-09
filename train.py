@@ -78,7 +78,6 @@ def train():
                 if lossval < minerr:
                     minerr = lossval
                     argminerr = len(errorrec) - 1
-                    shutil.rmtree(modelpath,True)
                     saver.save(sess,modelpath)
 
 train()
