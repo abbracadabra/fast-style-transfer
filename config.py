@@ -4,13 +4,12 @@ modelpath = r"D:\Users\yl_gong\Desktop\ckp\ckp"
 testimg = r"D:\Users\yl_gong\Desktop\tp\000037.jpg"
 testpath = r"D:\Users\yl_gong\Desktop\tp"
 savepath = r"D:\Users\yl_gong\Desktop\sp"
-epoch = 1
+epoch = 2
 batchsize = 4
 
 styletensors = [
-           "MobilenetV2/expanded_conv_3/expand/Relu6:0",
-           "MobilenetV2/expanded_conv_6/expand/Relu6:0",
-           "MobilenetV2/expanded_conv_9/expand/Relu6:0",
-           "MobilenetV2/expanded_conv_12/expand/Relu6:0"
+           "MobilenetV2/expanded_conv_6/depthwise/Relu6:0",
+           "MobilenetV2/expanded_conv_12/depthwise/Relu6:0",
+           "MobilenetV2/expanded_conv_9/depthwise/Relu6:0"
            ]
 content = r'MobilenetV2/expanded_conv_10/expand/Relu6:0'

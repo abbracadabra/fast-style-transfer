@@ -33,7 +33,7 @@ predcontenttensor, predstyletensors = extractnet.extract(synthesizetensor,prefix
 contenttensor, styletensors = extractnet.extract(input,prefix="B")
 
 styleim = Image.open(styleimg)
-styleim = styleim.resize((224, 224), Image.ANTIALIAS)
+#styleim = styleim.resize((224, 224), Image.ANTIALIAS)
 styleim = np.expand_dims(np.array(styleim) / 255., axis=0)
 styles = sess.run(styletensors,feed_dict={input:styleim})
 grams = []
@@ -45,17 +45,19 @@ for style in styles:
     styletranspose = np.transpose(style,[1,0])
     gram = np.matmul(style,styletranspose)/style.shape[1]
     grams.append(gram)
-loss = 7.5*tf.reduce_sum((predcontenttensor-contenttensor)**2)/tf.cast(tf.size(contenttensor),dtype=tf.float32)
+loss = tf.reduce_sum((predcontenttensor-contenttensor)**2)/tf.cast(tf.size(contenttensor[0]),dtype=tf.float32)
 for predstyletensor,truthgram in zip(predstyletensors,grams):
     predstyletensor = tf.transpose(predstyletensor,[0,3,1,2])
     shape = tf.shape(predstyletensor)
     predstyletensor = tf.reshape(predstyletensor,shape=[shape[0],shape[1],-1])
     grampred = tf.matmul(predstyletensor,predstyletensor,transpose_b=True)/tf.cast(tf.shape(predstyletensor)[2],dtype=tf.float32)
-    loss+=100*tf.reduce_sum((grampred-truthgram)**2)/truthgram.size
+    loss+=30*tf.reduce_sum((grampred-truthgram)**2)/truthgram.size
 loss/=batchsize
-saver = tf.train.Saver()
 trainop = tf.train.AdamOptimizer(learning_rate=0.001).minimize(loss)
-sess.run(tf.global_variables_initializer())
+saver = tf.train.Saver()
+#sess.run(tf.global_variables_initializer())
+saver.restore(sess,modelpath)
+
 
 def train():
     for ep in range(epoch):
@@ -69,7 +71,8 @@ def train():
             if i % 5 == 0:
                 synthesizeimgs, lossval = sess.run([synthesizetensor, loss], feed_dict={input: testims})
                 errorrec.append(lossval)
-                if len(errorrec) - argminerr > 30:
+                print("validate loss:"+str(lossval))
+                if len(errorrec) - argminerr > 100:
                     return
                 list(map(os.unlink, (os.path.join(savepath, f) for f in os.listdir(savepath))))
                 for im in synthesizeimgs:
