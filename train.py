@@ -7,6 +7,7 @@ import os
 from config import *
 import uuid
 import shutil
+import config
 
 def traingen(dirpath):
     flist = os.listdir(dirpath)
@@ -51,9 +52,9 @@ for predstyletensor,truthgram in zip(predstyletensors,grams):
     shape = tf.shape(predstyletensor)
     predstyletensor = tf.reshape(predstyletensor,shape=[shape[0],shape[1],-1])
     grampred = tf.matmul(predstyletensor,predstyletensor,transpose_b=True)/tf.cast(tf.shape(predstyletensor)[2],dtype=tf.float32)
-    loss+=30*tf.reduce_sum((grampred-truthgram)**2)/truthgram.size
+    loss+=30*tf.reduce_sum((grampred-truthgram)**2)/truthgram.size/len(config.styletensors)
 loss/=batchsize
-trainop = tf.train.AdamOptimizer(learning_rate=0.001).minimize(loss)
+trainop = tf.train.AdamOptimizer(learning_rate=0.0001).minimize(loss)
 saver = tf.train.Saver()
 #sess.run(tf.global_variables_initializer())
 saver.restore(sess,modelpath)
