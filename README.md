@@ -1,6 +1,8 @@
-<h2>a rip-off from [others' work](https://github.com/lengstrom/fast-style-transfer)</h2>
-
-
+## a rip-off from [others' work](https://github.com/lengstrom/fast-style-transfer)
+- mobilenet_v2 as feature extractor
+- instance normalization instead of batch normalization
+- trained on voc2007 test images
+- took 1h? on a desktop cpu
 
 <h2>demo</h2>
 <div>
